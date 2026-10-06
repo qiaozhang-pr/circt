@@ -652,3 +652,40 @@ module TestBufif1WideEnable(
   // CHECK: moore.assign [[DATA_OUT]], [[RESULT]] : l1
   bufif1 bufif1_inst(data_out, data_in, en);
 endmodule
+primitive udp_comb_and(out, a, b);
+    output out;
+    input a, b;
+    table
+        1 1 : 1 ;
+        0 ? : 0 ;
+        ? 0 : 0 ;
+    endtable
+endprimitive
+
+// CHECK-LABEL: moore.module @udp_comb_prim()
+// CHECK: [[A:%.+]] = moore.net wire : <l1>
+// CHECK: [[B:%.+]] = moore.net wire : <l1>
+// CHECK: [[Q:%.+]] = moore.net wire : <l1>
+// CHECK: [[RD_A:%.+]] = moore.read [[A]] : <l1>
+// CHECK: [[RD_B:%.+]] = moore.read [[B]] : <l1>
+// CHECK: [[AND:%.+]] = moore.and [[RD_A]], [[RD_B]] : l1
+// CHECK: moore.assign [[Q]], [[AND]] : l1
+module udp_comb_prim;
+    wire A, B, Q;
+    udp_comb_and u1 (Q, A, B);
+endmodule
+
+// CHECK-LABEL: moore.module @udp_comb_delayed_prim()
+// CHECK: [[A:%.+]] = moore.net wire : <l1>
+// CHECK: [[B:%.+]] = moore.net wire : <l1>
+// CHECK: [[Q:%.+]] = moore.net wire : <l1>
+// CHECK: [[RD_A:%.+]] = moore.read [[A]] : <l1>
+// CHECK: [[RD_B:%.+]] = moore.read [[B]] : <l1>
+// CHECK: [[AND:%.+]] = moore.and [[RD_A]], [[RD_B]] : l1
+// CHECK: [[DELAYCONST:%.+]] = moore.constant_time 5000000 fs
+// CHECK: moore.delayed_assign [[Q]], [[AND]], [[DELAYCONST]] : l1
+module udp_comb_delayed_prim;
+    wire A, B, Q;
+    udp_comb_and #5 u1 (Q, A, B);
+endmodule
+
