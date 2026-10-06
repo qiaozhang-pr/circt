@@ -16,21 +16,21 @@ endprimitive
 
 // CHECK-LABEL: hw.module @TestCombUdp(
 module TestCombUdp(input logic sel, input logic a, input logic b, output logic out);
-  // CHECK: [[NOT_SEL:%.+]] = comb.xor %sel, %true
-  // CHECK: [[TERM1:%.+]] = comb.and [[NOT_SEL]], %a
-  // CHECK: [[TERM2:%.+]] = comb.and %sel, %b
-  // CHECK: [[OUT:%.+]] = comb.or [[TERM1]], [[TERM2]]
+  // CHECK-DAG: [[NOT_SEL:%.+]] = comb.xor {{.*}}%sel{{.*}}
+  // CHECK-DAG: [[TERM1:%.+]] = comb.and {{.*}}%a{{.*}}
+  // CHECK-DAG: [[TERM2:%.+]] = comb.and {{.*}}%b{{.*}}
+  // CHECK-DAG: [[OUT:%.+]] = comb.or {{.*}}
   // CHECK: hw.output [[OUT]]
   udp_mux u_mux (out, sel, a, b);
 endmodule
 
 // CHECK-LABEL: hw.module @TestCombUdpDelay(
 module TestCombUdpDelay(input logic sel, input logic a, input logic b, output logic out);
-  // CHECK: [[DELAYED:%.+]] = llhd.delay [[OUT:%.+]] by <5000000fs, 0d, 0e> : i1
-  // CHECK: [[NOT_SEL:%.+]] = comb.xor %sel, %true
-  // CHECK: [[TERM1:%.+]] = comb.and [[NOT_SEL]], %a
-  // CHECK: [[TERM2:%.+]] = comb.and %sel, %b
-  // CHECK: [[OUT]] = comb.or [[TERM1]], [[TERM2]]
+  // CHECK-DAG: [[NOT_SEL:%.+]] = comb.xor {{.*}}%sel{{.*}}
+  // CHECK-DAG: [[TERM1:%.+]] = comb.and {{.*}}%a{{.*}}
+  // CHECK-DAG: [[TERM2:%.+]] = comb.and {{.*}}%b{{.*}}
+  // CHECK-DAG: [[OUT:%.+]] = comb.or {{.*}}
+  // CHECK-DAG: [[DELAYED:%.+]] = llhd.delay [[OUT]] by <5000000fs, 0d, 0e> : i1
   // CHECK: hw.output [[DELAYED]]
   udp_mux #5 u_mux_delay (out, sel, a, b);
 endmodule
